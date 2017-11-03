@@ -8,7 +8,7 @@ structure.
 
 ## Options
 
-```sh
+```
 usage: Web Auth Checker [-h] [-v] [-t THREADS] [-c COOKIE] [-a AUTH]                         
                         [-o OUTPUT] [-r REDIRECT] [-s STATUS] [-b BODY]
                         URL_FILE  
@@ -37,7 +37,7 @@ optional arguments:
 
 ## Examples
 
-```sh
+```
 python wac.py -r '/auth/login' site_urls.txt # anonymous test redirect
 python wac.py -c 'MY_COOKIE_STRING' -r '/auth/login' site_urls.txt # cookie test redirect
 python wac.py -a user:password -s 401 site_urls.txt # basic auth test 401 response
