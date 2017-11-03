@@ -27,6 +27,7 @@ args = ()
 urls = Queue()
 remaining = 0
 
+
 def work():
   global remaining
 
@@ -34,7 +35,8 @@ def work():
     while not urls.empty():
       url = urls.get()
       headers = {}
-      auth = None
+      user = None
+      pwd = None
 
       # keep the user informed of progress
       if remaining % 30 == 0:
@@ -52,26 +54,26 @@ def work():
         # check different requirements
         if not args.status is None:
           if args.status == resp.status_code:
-            args.output.write("DENIED: %s\n" % url)
+            args.output.write("DENIED %s\n" % url)
             continue
 
         if not args.redirect is None:
           if resp.status_code == STATUS_REDIRECT:
             location = resp.headers['location']
             if re.search(args.redirect, location, re.IGNORECASE):
-              args.output.write("DENIED: %s\n" % url)
+              args.output.write("DENIED %s\n" % url)
               continue
 
         if not args.body is None:
           if re.search(args.body, resp.text):
-            args.output.write("DENIED: %s\n" % url)
+            args.output.write("DENIED %s\n" % url)
             continue
 
         # if they made it to here then they have access
-        args.output.write("GRANTED: %s\n" % url)
+        args.output.write("GRANTED %s\n" % url)
 
       except requests.exceptions.RequestException as e:
-        args.output.write("[!] request failed: [%s], %s\n" % (url, e))
+        args.output.write("FAIL %s:%s\n" % (url, e))
       finally:
         remaining -= 1
 
@@ -102,6 +104,9 @@ def main():
 
   print "[*] urls found: %d" % remaining 
 
+  # output header
+  args.output.write("STATUS URL DETAILS\n")
+
   # spin up the threads to do the work
   for i in range(args.threads):
     t = Thread(name="web req thread: %d" % i, target=work)
@@ -112,14 +117,13 @@ if __name__ == "__main__":
   parser = ArgumentParser("Web Auth Checker")
 
   # madatory args
-  parser.add_argument("url_file", help="file with urls to check", type=FileType("r"), metavar="URL_FILE")
+  parser.add_argument("url_file", help="file with urls to check (use - for STDIN)", type=FileType("r"), metavar="URL_FILE", default=sys.stdin)
 
   # options args
-  parser.add_argument("-v", "--verbose", help="extra logging", action="store_true")
   parser.add_argument("-t", "--threads", help="number of request threads (default 10)", type=int, default=DEF_THREADS)
   parser.add_argument("-c", "--cookie", help="cookie to use for requests", type=str)
   parser.add_argument("-a", "--auth", help="authorization to use for requests in format user:pwd", type=str)
-  parser.add_argument("-o", "--output", help="output file (default stdout)", type=FileType("w"), default=sys.stdout)
+  parser.add_argument("-o", "--output", help="output file (default STDOUT)", type=FileType("w"), default=sys.stdout)
 
   # reponse options
   parser.add_argument("-r", "--redirect", help="check for a redirect using status of 302 and Location header", type=str)
