@@ -120,7 +120,7 @@ if __name__ == "__main__":
   parser.add_argument("url_file", help="file with urls to check (use - for STDIN)", type=FileType("r"), metavar="URL_FILE", default=sys.stdin)
 
   # options args
-  parser.add_argument("-t", "--threads", help="number of request threads (default 10)", type=int, default=DEF_THREADS)
+  parser.add_argument("-t", "--threads", help="number of request threads (default %d)" % DEF_THREADS, type=int, default=DEF_THREADS)
   parser.add_argument("-c", "--cookie", help="cookie to use for requests", type=str)
   parser.add_argument("-a", "--auth", help="authorization to use for requests in format user:pwd", type=str)
   parser.add_argument("-o", "--output", help="output file (default STDOUT)", type=FileType("w"), default=sys.stdout)
